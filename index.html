@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的学习之路 · 大一专属追踪站</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --primary: #4f6ef7;
+    --primary-dark: #3b55d9;
+    --green: #22c55e;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 14px;
+    --shadow: 0 2px 10px rgba(30, 41, 59, .06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.6;
+    padding-bottom: 60px;
+  }
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  /* ===== Header ===== */
+  header {
+    background: linear-gradient(135deg, #4f6ef7 0%, #8b5cf6 60%, #a855f7 100%);
+    color: #fff; padding: 30px 0 24px; border-radius: 0 0 24px 24px;
+  }
+  header .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .site-title { font-size: 1.6rem; font-weight: 700; letter-spacing: .5px; }
+  .site-sub { opacity: .85; font-size: .92rem; margin-top: 2px; }
+  .date-badge {
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+    padding: 8px 16px; border-radius: 999px; font-size: .9rem; backdrop-filter: blur(4px);
+  }
+
+  /* ===== Stats ===== */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: -34px 0 22px; }
+  .stat {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .stat .num { font-size: 1.7rem; font-weight: 800; }
+  .stat .label { color: var(--muted); font-size: .85rem; }
+  .stat .bar { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+  .stat .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--primary), #8b5cf6); border-radius: 99px; transition: width .4s; }
+  .stat.python .num { color: var(--primary); }
+  .stat.english .num { color: var(--orange); }
+  .stat.streak .num { color: var(--green); }
+
+  /* ===== Card ===== */
+  .card {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 20px; margin-bottom: 18px;
+  }
+  .card h2 {
+    font-size: 1.15rem; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;
+  }
+  .card .desc { color: var(--muted); font-size: .85rem; margin-bottom: 14px; }
+  .card h2 .tag {
+    font-size: .7rem; background: #eef2ff; color: var(--primary-dark);
+    padding: 2px 10px; border-radius: 99px; font-weight: 600;
+  }
+  .card h2 .tag.gold { background: #fef3c7; color: #b45309; }
+  .card h2 .tag.green { background: #dcfce7; color: #15803d; }
+
+  /* ===== Python map ===== */
+  .phase { margin-bottom: 10px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .phase-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; cursor: pointer; user-select: none; background: #f8fafc;
+  }
+  .phase-head:hover { background: #f1f5f9; }
+  .phase-head .name { font-weight: 700; font-size: .95rem; }
+  .phase-head .cnt { color: var(--muted); font-size: .8rem; }
+  .phase-body { padding: 6px 16px 12px; }
+  .chapter { display: flex; align-items: center; gap: 10px; padding: 7px 2px; border-bottom: 1px dashed var(--border); }
+  .chapter:last-child { border-bottom: none; }
+  .chapter label { flex: 1; cursor: pointer; font-size: .93rem; }
+  .chapter .link { color: var(--primary); text-decoration: none; font-size: .82rem; opacity: 0; transition: opacity .2s; white-space: nowrap; }
+  .chapter:hover .link { opacity: 1; }
+  .chapter input { width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
+  .chapter.done label { color: var(--muted); text-decoration: line-through; }
+
+  /* ===== English phases ===== */
+  .ephase {
+    border-left: 4px solid var(--border); padding: 10px 14px; margin-bottom: 10px;
+    background: #fafbfe; border-radius: 0 10px 10px 0;
+  }
+  .ephase.active { border-left-color: var(--orange); background: #fffaf0; }
+  .ephase .ehead { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px; }
+  .ephase .etitle { font-weight: 700; }
+  .ephase .etime { color: var(--muted); font-size: .8rem; }
+  .ephase .etask { font-size: .88rem; margin-top: 4px; color: #334155; }
+  .echeck { margin-left: auto; display: flex; gap: 8px; align-items: center; font-size: .8rem; color: var(--muted); }
+
+  /* ===== Daily tasks ===== */
+  .task-row {
+    display: flex; align-items: center; gap: 12px; padding: 10px 6px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-row .tbox { display: flex; align-items: center; gap: 12px; flex: 1; cursor: pointer; }
+  .task-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--green); cursor: pointer; }
+  .task-row .tname { font-size: .95rem; }
+  .task-row .tmeta { color: var(--muted); font-size: .78rem; }
+  .task-row .del {
+    border: none; background: transparent; color: #cbd5e1; font-size: 1.1rem;
+    cursor: pointer; padding: 4px 8px; border-radius: 8px;
+  }
+  .task-row .del:hover { background: #fef2f2; color: var(--red); }
+  .task-row.done .tname { text-decoration: line-through; color: var(--muted); }
+  .add-task { display: flex; gap: 8px; margin-top: 12px; }
+  .add-task input {
+    flex: 1; padding: 9px 14px; border: 1px solid var(--border); border-radius: 10px;
+    font-size: .9rem; outline: none;
+  }
+  .add-task input:focus { border-color: var(--primary); }
+  .btn {
+    border: none; border-radius: 10px; padding: 9px 18px; font-size: .9rem; font-weight: 600;
+    cursor: pointer; background: var(--primary); color: #fff; transition: opacity .15s;
+  }
+  .btn:hover { opacity: .88; }
+  .btn.ghost { background: #eef2ff; color: var(--primary-dark); }
+  .btn.green { background: var(--green); }
+  .btn.small { padding: 6px 12px; font-size: .8rem; }
+
+  /* ===== Calendar heatmap ===== */
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+  .cal-day {
+    aspect-ratio: 1; border-radius: 8px; background: #eef2f7;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem; color: var(--muted); position: relative;
+  }
+  .cal-day.lv1 { background: #c7d2fe; color: #3730a3; font-weight: 700; }
+  .cal-day.lv2 { background: #818cf8; color: #fff; font-weight: 700; }
+  .cal-day.lv3 { background: #4f46e5; color: #fff; font-weight: 700; }
+  .cal-day.today { outline: 2px solid var(--primary); outline-offset: 1px; }
+  .cal-day.future { background: transparent; }
+  .cal-legend { display: flex; gap: 10px; margin-top: 10px; align-items: center; font-size: .75rem; color: var(--muted); }
+  .cal-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; margin-right: 3px; vertical-align: -1px; }
+
+  /* ===== 云同步 ===== */
+  .sync-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+    padding: 8px 14px; border-radius: 999px; font-size: .85rem; cursor: pointer;
+    transition: background .2s;
+  }
+  .sync-pill:hover { background: rgba(255,255,255,.3); }
+  .sync-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; flex-shrink: 0; }
+  .sync-pill.ok .dot { background: #4ade80; }
+  .sync-pill.err .dot { background: #f87171; }
+  .sync-pill.busy .dot { background: #fbbf24; animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+  .sync-card { border: 1px solid #dbeafe; background: linear-gradient(180deg, #f8faff, #fff); }
+  .sync-code-box {
+    display: flex; align-items: center; gap: 10px; background: #eef2ff;
+    border: 1px dashed #a5b4fc; border-radius: 10px; padding: 10px 14px; margin: 8px 0 4px;
+  }
+  .sync-code { font-family: Consolas, monospace; font-size: 1.05rem; font-weight: 700; letter-spacing: 2px; color: var(--primary-dark); flex: 1; }
+  .sync-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+  .sync-msg { font-size: .82rem; color: var(--muted); margin-top: 6px; }
+  .sync-msg.ok { color: #15803d; }
+  .sync-msg.err { color: #b91c1c; }
+  .sync-hint { font-size: .8rem; color: var(--muted); background: #f1f5f9; border-radius: 8px; padding: 8px 12px; margin-top: 10px; line-height: 1.7; }
+  .sync-hint code { background: #e2e8f0; padding: 1px 6px; border-radius: 4px; font-size: .78rem; }
+
+  footer { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 26px; }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1e293b; color: #fff; padding: 10px 22px; border-radius: 99px;
+    font-size: .88rem; opacity: 0; transition: all .3s; z-index: 99;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  @media (max-width: 600px) {
+    .chapter .link { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div>
+      <div class="site-title">📚 我的学习之路</div>
+      <div class="site-sub">软件安全与管理 · 大一 · Python 编程 + 英语四级双线作战</div>
+    </div>
+    <div class="date-badge" id="dateBadge"></div>
+    <div class="sync-pill" id="syncPill" onclick="manualSync()" title="点击立即同步">
+      <span class="dot"></span><span id="syncPillText">云同步 · 待连接</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 统计 -->
+  <div class="stats">
+    <div class="stat python">
+      <div class="num" id="pyPct">0%</div>
+      <div class="label">🐍 Python 章节完成</div>
+      <div class="bar"><i id="pyBar" style="width:0%"></i></div>
+    </div>
+    <div class="stat english">
+      <div class="num" id="cetCountdown">--天</div>
+      <div class="label">🇬🇧 距四级考试（预估）</div>
+      <div class="bar"><i id="cetBar" style="width:30%"></i></div>
+    </div>
+    <div class="stat streak">
+      <div class="num" id="streakNum">0</div>
+      <div class="label">🔥 连续打卡天数</div>
+      <div class="bar"><i id="streakBar" style="width:0%"></i></div>
+    </div>
+  </div>
+
+  <!-- 今日打卡 -->
+  <div class="card">
+    <h2>✅ 今日打卡 <span class="tag green" id="phaseTag">军训期 · 轻量模式</span></h2>
+    <div class="desc">完成一项就勾一项，数据自动保存到本浏览器。军训期间不硬撑，达标即可。</div>
+    <div id="taskList"></div>
+    <div class="add-task">
+      <input id="newTask" placeholder="添加自定义任务（例如：复习高数 30 分钟）" maxlength="40">
+      <button class="btn green small" onclick="addTask()">添加</button>
+    </div>
+  </div>
+
+  <!-- 四级英语 -->
+  <div class="card">
+    <h2>🇬🇧 四级英语作战计划 <span class="tag gold">每日 1~2h</span></h2>
+    <div class="desc">目标分数 425+。9月基础 → 10月练题 → 11月突破 → 12月冲刺。当前阶段会高亮显示。</div>
+    <div id="ephases"></div>
+  </div>
+
+  <!-- Python 学习地图 -->
+  <div class="card">
+    <h2>🐍 Python 学习地图 <span class="tag">菜鸟教程 · 主线</span></h2>
+    <div class="desc">每天 40min~1h，以练题为主：先读教程章节 → 敲例子 → 做 2 道练习。点击章节名跳转菜鸟教程原文。</div>
+    <div id="pyMap"></div>
+  </div>
+
+  <!-- 打卡日历 -->
+  <div class="card">
+    <h2>📆 近 6 周打卡热力图 <span class="tag green">自律可视化</span></h2>
+    <div class="desc">每天完成 ≥2 项任务记一格，颜色越深完成越多。断卡别慌，明天继续就是赢。</div>
+    <div class="cal" id="calendar"></div>
+    <div class="cal-legend">
+      <span><i style="background:#eef2f7"></i>未打卡</span>
+      <span><i style="background:#c7d2fe"></i>1~2项</span>
+      <span><i style="background:#818cf8"></i>3~4项</span>
+      <span><i style="background:#4f46e5"></i>全部完成</span>
+    </div>
+  </div>
+
+  <!-- 云同步设置 -->
+  <div class="card sync-card">
+    <h2>☁️ 云同步 · 多设备打卡 <span class="tag green" id="syncStateTag">kvdb.io</span></h2>
+    <div class="desc">你的打卡数据可以存到云端，换电脑/手机打开同一页面就自动同步。首次使用请点「创建我的同步空间」，或粘贴别人分享的「同步码」加入同一空间。</div>
+    <div class="sync-code-box">
+      <span>🔑 我的同步码</span>
+      <span class="sync-code" id="syncCode">—</span>
+      <button class="btn ghost small" onclick="genNewCode()">🎲 新建空间</button>
+    </div>
+    <div class="sync-row">
+      <input id="joinCodeInput" placeholder="粘贴别人的同步码加入" style="flex:1;padding:9px 14px;border:1px solid var(--border);border-radius:10px;font-size:.9rem;outline:none;max-width:280px">
+      <button class="btn small" onclick="joinCode()">加入</button>
+      <button class="btn small" onclick="manualSync()">🔄 立即同步</button>
+    </div>
+    <div class="sync-msg" id="syncMsg">尚未连接云端。</div>
+    <div class="sync-hint">
+      💡 <b>多设备同步方法</b>：① 在这台电脑点「🎲 新建空间」生成同步码 → ② 在另一台设备（手机/另一台电脑）打开同一个 index.html → ③ 粘贴同步码点「加入」→ 两边数据自动合并。<br>
+      📌 数据存放在 kvdb.io 免费云端，仅保存打卡记录，不含任何隐私。离线也能正常打卡，联网后自动补同步。
+    </div>
+  </div>
+
+  <footer>本地学习追踪站 · 数据保存在浏览器 localStorage + 可选云端同步 · 加油，大一新生！</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================== 数据层 ================== */
+const LS_DAILY   = 'lroad_daily_v1';      // { 'YYYY-MM-DD': ['任务文本', ...] }
+const LS_PY      = 'lroad_python_v1';     // [章节索引]
+const LS_CET     = 'lroad_cet_v1';        // { phaseIdx: [任务索引] }
+const LS_EXTRA   = 'lroad_extra_v1';      // ['自定义任务文本', ...]
+
+const CET_EXAM_DATE = '2026-12-19';       // 预估四级考试日（以准考证为准），可自行修改
+
+function load(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(e) { return d; } }
+function save(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+
+/* ================== Python 章节 ================== */
+const PY_PHASES = [
+  { name: '🟢 入门 · 让 Python 跑起来', chapters: [
+    ['Python3 简介', 'python3-intro'],
+    ['环境搭建（安装 Python）', 'python3-install'],
+    ['Python3 解释器', 'python3-interpreter'],
+    ['基础语法（缩进/注释/变量）', 'python3-basic-syntax'],
+  ]},
+  { name: '🔵 基础 · 玩转数据类型', chapters: [
+    ['变量类型', 'python3-data-type'],
+    ['数字 (Number)', 'python3-number'],
+    ['字符串 (String)', 'python3-string'],
+    ['列表 (List)', 'python3-list'],
+  ]},
+  { name: '🟣 基础+ · 分支与循环逻辑', chapters: [
+    ['元组 (Tuple)', 'python3-tuple'],
+    ['字典 (Dictionary)', 'python3-dictionary'],
+    ['集合 (Set)', 'python3-set'],
+    ['条件控制 (if)', 'python3-conditional-statements'],
+    ['循环 (for / while)', 'python3-loop'],
+  ]},
+  { name: '🟠 进阶 · 组织代码结构', chapters: [
+    ['函数 (Function)', 'python3-function'],
+    ['迭代器与生成器', 'python3-iterator-generator'],
+    ['数据结构', 'python3-data-structure'],
+    ['模块 (Module)', 'python3-module'],
+    ['输入和输出 (I/O)', 'python3-inputoutput'],
+  ]},
+  { name: '🔴 进阶+ · 能写小项目', chapters: [
+    ['错误和异常处理', 'python3-errors-execptions'],
+    ['面向对象 (Class)', 'python3-class'],
+    ['命名空间 / 作用域', 'python3-namespace-scope'],
+    ['标准库概览', 'python3-stdlib'],
+  ]},
+  { name: '⭐ 选学 · 按需补刀', chapters: [
+    ['正则表达式', 'python3-reg-expressions'],
+    ['JSON 处理', 'python3-json'],
+    ['日期和时间', 'python3-date-time'],
+    ['pip 包管理', 'python3-pip'],
+    ['内置函数速查', 'python3-built-in-functions'],
+  ]},
+];
+
+/* ================== 四级阶段 ================== */
+const CET_PHASES = [
+  { title: '9月 · 基础（军训期轻量版）', time: '现在 ~ 9/30', active: true,
+    tasks: ['每天背单词 30 个（App/单词书）', '真题听力当背景音磨耳朵 15min', '军训太累可只完成背单词一项'] },
+  { title: '10月 · 练题（开课期）', time: '10/1 ~ 10/31', active: false,
+    tasks: ['词汇滚动复习（新词 30 + 复习旧词）', '真题阅读精练 1 篇（限时 8min/篇）', '真题听力精听 1 段（听写训练）'] },
+  { title: '11月 · 重点突破', time: '11/1 ~ 11/30', active: false,
+    tasks: ['每周成套刷真题 2 套（限时）', '弱项专项：听力或阅读二选一', '背诵作文模板 + 万能句式'] },
+  { title: '12月 · 冲刺模考', time: '12/1 ~ 考试日', active: false,
+    tasks: ['考前 3 周：每周 2 次限时模考', '查漏补缺 + 错题复盘', '背熟作文模板，调整作息'] },
+];
+
+/* ================== 渲染 ================== */
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+let pyDone = load(LS_PY, []);
+let daily  = load(LS_DAILY, {});
+let cet    = load(LS_CET, {});
+let extra  = load(LS_EXTRA, []);
+
+/* --- 顶部日期 --- */
+function renderDate() {
+  const d = new Date();
+  const wd = ['日','一','二','三','四','五','六'][d.getDay()];
+  $('dateBadge').textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 星期${wd}`;
+  // 军训期判定（9/30 前）
+  const today = todayStr();
+  $('phaseTag').textContent = today <= '2026-09-30' ? '军训期 · 轻量模式' : '学期中 · 标准模式';
+}
+
+/* --- Python 地图 --- */
+function renderPy() {
+  const total = PY_PHASES.reduce((n, p) => n + p.chapters.length, 0);
+  const doneCount = pyDone.length;
+  const pct = total ? Math.round(doneCount / total * 100) : 0;
+  $('pyPct').textContent = pct + '%';
+  $('pyBar').style.width = pct + '%';
+
+  $('pyMap').innerHTML = PY_PHASES.map((phase, pi) => {
+    const doneIn = phase.chapters.filter((_, ci) => pyDone.includes(key(pi, ci))).length;
+    return `<details class="phase" ${doneIn === phase.chapters.length && phase.chapters.length > 0 ? '' : 'open'}>
+      <summary class="phase-head">
+        <span class="name">${phase.name}</span>
+        <span class="cnt">${doneIn}/${phase.chapters.length}</span>
+      </summary>
+      <div class="phase-body">
+        ${phase.chapters.map((ch, ci) => {
+          const k = key(pi, ci);
+          const checked = pyDone.includes(k);
+          return `<div class="chapter ${checked ? 'done' : ''}">
+            <input type="checkbox" id="py-${k}" ${checked ? 'checked' : ''} onchange="togglePy(${pi},${ci})">
+            <label for="py-${k}">${ch[0]}</label>
+            <a class="link" href="https://www.runoob.com/python3/${ch[1]}.html" target="_blank">查看教程 ↗</a>
+          </div>`;
+        }).join('')}
+      </div>
+    </details>`;
+  }).join('');
+}
+function key(pi, ci) { return pi + '-' + ci; }
+function togglePy(pi, ci) {
+  const k = key(pi, ci);
+  const i = pyDone.indexOf(k);
+  if (i >= 0) pyDone.splice(i, 1); else pyDone.push(k);
+  save(LS_PY, pyDone);
+  renderPy(); renderStats();
+  if (pyDone.includes(k)) toast('🎉 章节已点亮，继续保持！');
+}
+
+/* --- 四级阶段 --- */
+function renderCet() {
+  $('ephases').innerHTML = CET_PHASES.map((p, i) => {
+    const doneT = (cet[i] || []);
+    const all = p.tasks.map((t, ti) => doneT.includes(ti)).every(Boolean);
+    return `<div class="ephase ${p.active ? 'active' : ''}">
+      <div class="ehead">
+        <span class="etitle">${p.title}</span>
+        <span class="etime">${p.time}</span>
+      </div>
+      ${p.tasks.map((t, ti) => {
+        const c = doneT.includes(ti);
+        return `<div class="task-row" style="padding:6px 0">
+          <div class="tbox" onclick="toggleCet(${i},${ti})">
+            <input type="checkbox" ${c ? 'checked' : ''} readonly>
+            <span class="tname" style="${c ? 'text-decoration:line-through;color:#94a3b8' : ''}">${esc(t)}</span>
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="echeck">${all && p.tasks.length ? '✅ 阶段目标达成' : ''}</div>
+    </div>`;
+  }).join('');
+}
+function toggleCet(pi, ti) {
+  const arr = cet[pi] || [];
+  const i = arr.indexOf(ti);
+  if (i >= 0) arr.splice(i, 1); else arr.push(ti);
+  cet[pi] = arr;
+  save(LS_CET, cet);
+  renderCet(); renderStats();
+}
+
+/* --- 今日任务 --- */
+function defaultTasks() {
+  return [
+    '🇬🇧 背英语单词 ≥30 个',
+    '🇬🇧 英语听力 / 阅读练习 20min',
+    '🐍 Python 看教程 + 敲代码 40min',
+    '🐍 练 2 道编程题（写完发导师点评）',
+    '📝 今日复盘：写下学到了啥',
+  ];
+}
+function todayTasks() { return daily[todayStr()] || defaultTasks().concat(extra); }
+function renderTasks() {
+  const list = todayTasks();
+  $('taskList').innerHTML = list.map((t, i) => {
+    // 勾选状态：自定义任务以文本为准（因为位置会变），默认任务以索引为准
+    const isDefault = i < 5 && defaultTasks().includes(t);
+    const doneSet = daily[todayStr()] ? JSON.parse(localStorage.getItem(LS_DAILY))[todayStr()] : null;
+    const checked = doneSet ? doneSet.includes(t) : false;
+    return `<div class="task-row ${checked ? 'done' : ''}">
+      <div class="tbox" onclick="toggleTask('${esc(t).replace(/'/g, "\\'")}')">
+        <input type="checkbox" ${checked ? 'checked' : ''} readonly>
+        <div><div class="tname">${esc(t)}</div></div>
+      </div>
+      ${!isDefault ? `<button class="del" onclick="delTask('${esc(t).replace(/'/g, "\\'")}')">✕</button>` : ''}
+    </div>`;
+  }).join('');
+  renderStats();
+}
+function toggleTask(text) {
+  const d = load(LS_DAILY, {});
+  const arr = d[todayStr()] || [];
+  const i = arr.indexOf(text);
+  if (i >= 0) arr.splice(i, 1); else arr.push(text);
+  d[todayStr()] = arr;
+  save(LS_DAILY, d);
+  renderTasks(); renderStats(); renderCal();
+}
+function addTask() {
+  const v = $('newTask').value.trim();
+  if (!v) return;
+  extra.push(v);
+  save(LS_EXTRA, extra);
+  $('newTask').value = '';
+  renderTasks();
+  toast('已添加自定义任务');
+}
+function delTask(text) {
+  extra = extra.filter(t => t !== text);
+  save(LS_EXTRA, extra);
+  // 若今天已勾选也移除
+  const d = load(LS_DAILY, {});
+  if (d[todayStr()]) { d[todayStr()] = d[todayStr()].filter(t => t !== text); save(LS_DAILY, d); }
+  renderTasks(); renderStats();
+}
+
+/* --- 统计 --- */
+function renderStats() {
+  // 连续打卡
+  const d = load(LS_DAILY, {});
+  let streak = 0;
+  const t = new Date();
+  for (let i = 0; i < 365; i++) {
+    const ds = fmt(t);
+    const arr = d[ds] || [];
+    if (arr.length >= 2) { streak++; t.setDate(t.getDate() - 1); }
+    else break;
+  }
+  $('streakNum').textContent = streak + ' 天';
+  $('streakBar').style.width = Math.min(streak * 5, 100) + '%';
+  // 四级倒计时
+  const days = Math.ceil((new Date(CET_EXAM_DATE) - new Date()) / 86400000);
+  $('cetCountdown').textContent = days > 0 ? days + ' 天' : '已开考';
+  const totalSpan = Math.ceil((new Date('2026-09-01') - new Date('2025-01-01')) / 86400000);
+  const prog = Math.max(0, Math.min(100, (new Date(CET_EXAM_DATE) - new Date()) / 110 * 1));
+  $('cetBar').style.width = Math.max(2, Math.min(100, 100 - days * 0.9)) + '%';
+}
+function fmt(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* --- 日历 --- */
+function renderCal() {
+  const d = load(LS_DAILY, {});
+  const today = new Date();
+  const cells = [];
+  const start = new Date(today); start.setDate(start.getDate() - 41); // 42 天 = 6 周
+  // 让日历从周一开始排列
+  const startDow = (start.getDay() + 6) % 7;
+  start.setDate(start.getDate() - startDow);
+  const end = new Date(start);
+  for (let i = 0; i < 42; i++) {
+    const ds = fmt(end);
+    const cnt = (d[ds] || []).length;
+    const isToday = ds === todayStr();
+    const isFuture = end > today;
+    let cls = 'cal-day';
+    if (isFuture) cls += ' future';
+    else if (cnt >= 5) cls += ' lv3';
+    else if (cnt >= 3) cls += ' lv2';
+    else if (cnt >= 1) cls += ' lv1';
+    if (isToday) cls += ' today';
+    cells.push(`<div class="${cls}">${end.getDate()}</div>`);
+    end.setDate(end.getDate() + 1);
+  }
+  $('calendar').innerHTML = cells.join('');
+}
+
+/* --- Toast --- */
+let toastTimer;
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+/* ================== 云同步 (kvdb.io) ================== */
+const KVDB_BUCKET = 'X6Q4EzzzirsW4mN7caKE9X';   // 学习之路共享桶
+const LS_CODE     = 'lroad_code_v1';            // 我的同步码
+let syncBusy = false;
+let syncTimer = null;
+
+function myCode() { return localStorage.getItem(LS_CODE) || ''; }
+function setCode(c) { localStorage.setItem(LS_CODE, c); $('syncCode').textContent = c; }
+function genNewCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)];
+  setCode(c);
+  $('joinCodeInput').value = '';
+  toast('🎲 已生成同步码 ' + c);
+  syncNow(true);
+}
+function joinCode() {
+  const v = ($('joinCodeInput').value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (v.length < 4) { toast('⚠️ 同步码至少 4 位'); return; }
+  setCode(v);
+  $('joinCodeInput').value = '';
+  toast('🔗 已加入同步空间 ' + v);
+  syncNow(true);
+}
+
+function collectLocal() {
+  return {
+    daily: load(LS_DAILY, {}),
+    py:    load(LS_PY, []),
+    cet:   load(LS_CET, {}),
+    extra: load(LS_EXTRA, []),
+    updatedAt: Date.now(),
+  };
+}
+
+/* 合并：以本地为基准，把云端有而本地没有的补进来（多端各自勾选 → 并集） */
+function mergeLocal(data) {
+  if (!data) return;
+  if (data.daily) {
+    const d = load(LS_DAILY, {});
+    Object.keys(data.daily).forEach(date => {
+      const cloudArr = data.daily[date] || [];
+      const localArr = d[date] || [];
+      d[date] = [...new Set([...localArr, ...cloudArr])];
+    });
+    save(LS_DAILY, d);
+  }
+  if (data.py) {
+    const p = new Set([...load(LS_PY, []), ...data.py]);
+    save(LS_PY, [...p]);
+  }
+  if (data.cet) {
+    const c = load(LS_CET, {});
+    Object.keys(data.cet).forEach(k => {
+      const a = c[k] || [], b = data.cet[k] || [];
+      c[k] = [...new Set([...a, ...b])];
+    });
+    save(LS_CET, c);
+  }
+  if (data.extra) {
+    const e = new Set([...load(LS_EXTRA, []), ...data.extra]);
+    save(LS_EXTRA, [...e]);
+  }
+}
+
+function setPill(state, text) {
+  const p = $('syncPill');
+  p.classList.remove('ok', 'err', 'busy');
+  if (state) p.classList.add(state);
+  $('syncPillText').textContent = text;
+}
+function setSyncMsg(text, cls) {
+  const m = $('syncMsg');
+  m.textContent = text;
+  m.className = 'sync-msg' + (cls ? ' ' + cls : '');
+}
+
+async function syncNow(manual) {
+  const code = myCode();
+  if (!code) {
+    setPill('', '云同步 · 未设置');
+    setSyncMsg('点击「🎲 新建空间」生成你的同步码，即可开始云端备份。', '');
+    return;
+  }
+  if (syncBusy) return;
+  syncBusy = true;
+  setPill('busy', '同步中…');
+  try {
+    // 1. 拉云端
+    const url = `https://kvdb.io/${KVDB_BUCKET}/${encodeURIComponent(code)}`;
+    const resp = await fetch(url);
+    if (resp.ok) {
+      const cloud = await resp.json();
+      mergeLocal(cloud);            // 云端 → 本地（并集）
+    } else if (resp.status !== 404) {
+      throw new Error('云端读取失败 HTTP ' + resp.status);
+    }
+    // 2. 全量回推（本地已是最新合并结果）
+    const local = collectLocal();
+    const put = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(local),
+    });
+    if (!put.ok) throw new Error('云端写入失败 HTTP ' + put.status);
+    // 3. 刷新界面
+    renderTasks(); renderPy(); renderCet(); renderCal(); renderStats();
+    const now = new Date();
+    setPill('ok', '已同步 ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    setSyncMsg('✅ 同步成功：本地与云端数据已合并。最后同步 ' + now.toLocaleTimeString(), 'ok');
+    if (manual) toast('🔄 同步完成');
+  } catch (e) {
+    console.error('sync error:', e);
+    setPill('err', '同步失败');
+    setSyncMsg('⚠️ ' + e.message + '（离线也能打卡，联网后点顶部按钮重试）', 'err');
+    if (manual) toast('⚠️ 同步失败，请检查网络');
+  } finally {
+    syncBusy = false;
+  }
+}
+
+/* 数据变更后延迟自动同步（防抖 2.5s） */
+function scheduleSync() {
+  if (!myCode()) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => syncNow(false), 2500);
+}
+
+/* 修改原勾选函数，让每次操作后自动触发云同步 */
+const _t0 = toggleTask;
+toggleTask = function (text) { _t0(text); scheduleSync(); };
+const _t1 = togglePy;
+togglePy = function (pi, ci) { _t1(pi, ci); scheduleSync(); };
+const _t2 = toggleCet;
+toggleCet = function (pi, ti) { _t2(pi, ti); scheduleSync(); };
+const _t3 = addTask;
+addTask = function () { _t3(); scheduleSync(); };
+const _t4 = delTask;
+delTask = function (text) { _t4(text); scheduleSync(); };
+
+/* --- 初始化 --- */
+renderDate(); renderPy(); renderCet(); renderTasks(); renderCal();
+(function initSync() {
+  const c = myCode();
+  if (c) {
+    $('syncCode').textContent = c;
+    setPill('', '连接中…');
+    syncNow(false);
+  } else {
+    $('syncCode').textContent = '—';
+    setPill('', '云同步 · 未设置');
+  }
+})();
+</script>
+</body>
+</html>
